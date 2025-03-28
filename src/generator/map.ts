@@ -23,6 +23,7 @@ export const typeMap: Record<string, string> = {
     TIMESTAMP: "string",
     "TIMESTAMP WITH LOCAL TIME ZONE": "string",
     "TIMESTAMP WITH TIME ZONE": "string",
+    "TIMESTAMP(6)": "string",
     VARCHAR2: "string",
     XMLTYPE: "string",
     VECTOR: "string",

@@ -144,7 +144,8 @@ export class OracleIntrospector implements DatabaseIntrospector {
                     hasDefaultValue: col.dataDefault !== null,
                     isAutoIncrementing: col.identityColumn === "YES",
                 }));
-            return { schema: view.owner, name: view.viewName, isView: true, columns };
+            const viewName = view.owner === "SYS" ? view.viewName.replace("_$", "$") : view.viewName;
+            return { schema: view.owner, name: viewName, isView: true, columns };
         });
         return views;
     }

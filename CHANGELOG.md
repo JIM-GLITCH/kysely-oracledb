@@ -1,5 +1,18 @@
 # kysely-oracledb
 
+## 1.8.4
+
+### Patch Changes
+
+- 01fbc4a: fixed issue with system views with \_$ format
+
+## 1.8.3
+
+### Patch Changes
+
+- 2b537ac: added fix for columns with symbols in
+- c37ccc1: Added TIMESTAMP(6) type map
+
 ## 1.8.2
 
 ### Patch Changes

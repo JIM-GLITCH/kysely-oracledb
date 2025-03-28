@@ -29,7 +29,7 @@ export const generateFieldTypes = (fields: ColumnMetadata[], useCamelCase = fals
             types.push("null");
         }
         const typesString = field.isAutoIncrementing ? `Generated<${types.join(" | ")}>` : types.join(" | ");
-        return `${useCamelCase ? camelCase(field.name) : field.name}: ${typesString}`;
+        return `${useCamelCase ? `'${camelCase(field.name)}'` : `'${field.name}'`}: ${typesString}`;
     });
     return fieldStrings.join("\n");
 };

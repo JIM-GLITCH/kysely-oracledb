@@ -24,7 +24,7 @@ describe("generateFieldTypes", () => {
                     isAutoIncrementing: false,
                 },
             ]),
-        ).toBe("name: string");
+        ).toBe("'name': string");
     });
     it("should generate type string for multiple fields", () => {
         expect(
@@ -44,7 +44,7 @@ describe("generateFieldTypes", () => {
                     isAutoIncrementing: false,
                 },
             ]),
-        ).toBe("first_name: string\nlast_name: string");
+        ).toBe("'first_name': string\n'last_name': string");
     });
     it("should generate type string for nullable field", () => {
         expect(
@@ -57,7 +57,7 @@ describe("generateFieldTypes", () => {
                     isAutoIncrementing: false,
                 },
             ]),
-        ).toBe("name: string | null");
+        ).toBe("'name': string | null");
     });
     it("should generate type string for identity field", () => {
         expect(
@@ -70,7 +70,7 @@ describe("generateFieldTypes", () => {
                     isAutoIncrementing: true,
                 },
             ]),
-        ).toBe("id: Generated<number>");
+        ).toBe("'id': Generated<number>");
     });
     it("should generate type string for camel case field", () => {
         expect(
@@ -86,7 +86,7 @@ describe("generateFieldTypes", () => {
                 ],
                 true,
             ),
-        ).toBe("firstName: string");
+        ).toBe("'firstName': string");
     });
     it("should throw error for unsupported data type", () => {
         expect(() =>
@@ -135,9 +135,9 @@ describe("generate table types", () => {
                 types:
                     "interface UserTable {" +
                     "\n" +
-                    "id: Generated<number>" +
+                    "'id': Generated<number>" +
                     "\n" +
-                    "name: string" +
+                    "'name': string" +
                     "\n" +
                     "}" +
                     "\n" +
@@ -207,9 +207,9 @@ describe("generate table types", () => {
                 types:
                     "interface UserTable {" +
                     "\n" +
-                    "id: Generated<number>" +
+                    "'id': Generated<number>" +
                     "\n" +
-                    "name: string" +
+                    "'name': string" +
                     "\n" +
                     "}" +
                     "\n" +
@@ -225,11 +225,11 @@ describe("generate table types", () => {
                 types:
                     "interface ProductTable {" +
                     "\n" +
-                    "id: Generated<number>" +
+                    "'id': Generated<number>" +
                     "\n" +
-                    "product: string" +
+                    "'product': string" +
                     "\n" +
-                    "price: number | null" +
+                    "'price': number | null" +
                     "\n" +
                     "}" +
                     "\n" +
@@ -275,9 +275,9 @@ describe("generate table types", () => {
                 types:
                     "interface UserProfileTable {" +
                     "\n" +
-                    "id: Generated<number>" +
+                    "'id': Generated<number>" +
                     "\n" +
-                    "name: string" +
+                    "'name': string" +
                     "\n" +
                     "}" +
                     "\n" +
