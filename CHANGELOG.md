@@ -1,5 +1,41 @@
 # kysely-oracledb
 
+## 1.8.10
+
+### Patch Changes
+
+- 1129699: added connection id to execution logs and added error logs
+
+## 1.8.9
+
+### Patch Changes
+
+- 57891dd: removing insertid for now as kysely doesn't support Oracle syntax
+
+## 1.8.8
+
+### Patch Changes
+
+- d9eaa86: fixed insertid conversion issue by casting string as bigint to support Oracle syntax
+
+## 1.8.7
+
+### Patch Changes
+
+- 0aac09e: added insertid to execute result
+
+## 1.8.6
+
+### Patch Changes
+
+- 53545f6: use Kysely ColumnType for date fields to allow correct insert type
+
+## 1.8.5
+
+### Patch Changes
+
+- d46258d: added length, precision, and scale attributes to introspector metadata
+
 ## 1.8.4
 
 ### Patch Changes

@@ -72,6 +72,19 @@ describe("generateFieldTypes", () => {
             ]),
         ).toBe("'id': Generated<number>");
     });
+    it("should generate type string for date", () => {
+        expect(
+            generateFieldTypes([
+                {
+                    name: "date",
+                    dataType: "DATE",
+                    isNullable: false,
+                    hasDefaultValue: false,
+                    isAutoIncrementing: false,
+                },
+            ]),
+        ).toBe("'date': ColumnType<string, Date, Date>");
+    });
     it("should generate type string for camel case field", () => {
         expect(
             generateFieldTypes(
@@ -305,7 +318,7 @@ describe("generateDatabaseTypes", () => {
                 "\n" +
                 "// Timestamp: 2025-01-01T00:00:00.000Z" +
                 "\n\n" +
-                "import type { Insertable, Selectable, Updateable, Generated } from 'kysely'" +
+                "import type { Insertable, Selectable, Updateable, Generated, ColumnType } from 'kysely'" +
                 "\n\n" +
                 "types string" +
                 "\n\n" +

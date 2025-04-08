@@ -19,21 +19,33 @@ export class OracleConnection implements DatabaseConnection {
     async executeQuery<R>(compiledQuery: CompiledQuery): Promise<QueryResult<R>> {
         const { sql, bindParams } = this.formatQuery(compiledQuery);
         const startTime = new Date();
-        this.#log.debug({ sql: this.formatQueryForLogging(compiledQuery) }, "Executing query");
-        const result = await this.#connection.execute<R>(sql, bindParams, {
-            outFormat: oracledb.OUT_FORMAT_OBJECT,
-            fetchTypeHandler: (metaData) => {
-                metaData.name = metaData.name.toLowerCase();
-                return undefined;
-            },
-            ...this.#executeOptions,
-        });
-        const endTime = new Date();
-        this.#log.debug({ durationMs: endTime.getTime() - startTime.getTime() }, "Execution complete");
-        return {
-            rows: result?.rows || [],
-            numAffectedRows: result.rowsAffected ? BigInt(result.rowsAffected) : undefined,
-        };
+        this.#log.debug({ sql: this.formatQueryForLogging(compiledQuery), id: this.#identifier }, "Executing query");
+        try {
+            const result = await this.#connection.execute<R>(sql, bindParams, {
+                outFormat: oracledb.OUT_FORMAT_OBJECT,
+                fetchTypeHandler: (metaData) => {
+                    metaData.name = metaData.name.toLowerCase();
+                    return undefined;
+                },
+                ...this.#executeOptions,
+            });
+            const endTime = new Date();
+            this.#log.debug(
+                { durationMs: endTime.getTime() - startTime.getTime(), id: this.#identifier },
+                "Execution complete",
+            );
+            return {
+                rows: result?.rows || [],
+                numAffectedRows: result.rowsAffected ? BigInt(result.rowsAffected) : undefined,
+            };
+        } catch (err) {
+            const endTime = new Date();
+            this.#log.error(
+                { err, durationMs: endTime.getTime() - startTime.getTime(), id: this.#identifier },
+                "Error executing query",
+            );
+            throw err;
+        }
     }
 
     formatQuery(query: CompiledQuery) {

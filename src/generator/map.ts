@@ -28,3 +28,11 @@ export const typeMap: Record<string, string> = {
     XMLTYPE: "string",
     VECTOR: "string",
 };
+
+export const dateTypes = [
+    "DATE",
+    "TIMESTAMP",
+    "TIMESTAMP WITH LOCAL TIME ZONE",
+    "TIMESTAMP WITH TIME ZONE",
+    "TIMESTAMP(6)",
+];

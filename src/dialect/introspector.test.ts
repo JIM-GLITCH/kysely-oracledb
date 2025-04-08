@@ -69,6 +69,9 @@ describe("OracleIntrospector", () => {
                         tableName: "DUAL",
                         columnName: "DUMMY",
                         dataType: "VARCHAR2",
+                        dataLength: 1,
+                        dataPrecision: null,
+                        dataScale: null,
                         nullable: "Y",
                         dataDefault: null,
                         identityColumn: null,
@@ -108,7 +111,7 @@ describe("OracleIntrospector", () => {
         );
         expect(mockedExecute).toHaveBeenNthCalledWith(
             3,
-            "select owner, tableName, columnName, dataType, nullable, dataDefault, identityColumn from allTabColumns where owner in (:0, :1) and tableName in (:2)",
+            "select owner, tableName, columnName, dataType, dataLength, dataPrecision, dataScale, nullable, dataDefault, identityColumn from allTabColumns where owner in (:0, :1) and tableName in (:2)",
             ["SYS", "SYS", "DUAL"],
             expect.anything(),
         );
@@ -122,6 +125,9 @@ describe("OracleIntrospector", () => {
                     {
                         name: "DUMMY",
                         dataType: "VARCHAR2",
+                        dataLength: 1,
+                        dataPrecision: null,
+                        dataScale: null,
                         isNullable: true,
                         hasDefaultValue: false,
                         isAutoIncrementing: false,
