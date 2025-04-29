@@ -5,7 +5,7 @@ import { format, Options } from "prettier";
 import { OracleDialect, OracleDialectConfig } from "../dialect/dialect.js";
 import { IntropsectorDB } from "../dialect/introspector.js";
 import { defaultLogger } from "../dialect/logger.js";
-import { dateTypes, typeMap } from "./map.js";
+import { typeMap } from "./map.js";
 import { camelCase, pascalCase } from "./utils.js";
 
 interface TableTypes {
@@ -15,17 +15,12 @@ interface TableTypes {
 }
 
 const warningComment = `// This file was generated automatically. Please don't edit it manually!`;
-const kyselyImport = `import type { Insertable, Selectable, Updateable, Generated, ColumnType } from 'kysely'`;
+const kyselyImport = `import type { Insertable, Selectable, Updateable, Generated } from 'kysely'`;
 const generationComment = (date: string) => `// Timestamp: ${date}`;
 
 export const generateFieldTypes = (fields: ColumnMetadata[], useCamelCase = false): string => {
     const fieldStrings = fields.map((field) => {
-        let type;
-        if (dateTypes.includes(field.dataType)) {
-            type = `ColumnType<${typeMap[field.dataType]}, Date, Date>`;
-        } else {
-            type = typeMap[field.dataType];
-        }
+        const type = typeMap[field.dataType];
         if (!type) {
             throw new Error(`Unsupported data type: ${field.dataType}`);
         }
@@ -92,6 +87,19 @@ export const checkDiff = (existingContent: string, newContent: string) => {
     return !!diff || existingLines.length !== newLines.length;
 };
 
+const updateTypes = (
+    types: string,
+    filePath: string,
+    metadata: TableMetadata[],
+    metadataFilePath: string,
+    config: OracleDialectConfig,
+) => {
+    writeToFile(types, filePath);
+    if (config.generator?.metadata) {
+        writeToFile(JSON.stringify(metadata, null, 2), metadataFilePath);
+    }
+};
+
 export const generate = async (config: OracleDialectConfig) => {
     const log = config.logger ? config.logger : defaultLogger;
     const type = config.generator?.type ?? "tables";
@@ -100,7 +108,7 @@ export const generate = async (config: OracleDialectConfig) => {
         const db = new Kysely<IntropsectorDB>({ dialect, plugins: [new CamelCasePlugin()] });
         const introspector = dialect.createIntrospector(db);
 
-        let tables;
+        let tables: TableMetadata[];
 
         switch (type) {
             case "tables":
@@ -120,29 +128,37 @@ export const generate = async (config: OracleDialectConfig) => {
         const formattedTypes = await formatTypes(databaseTypes, config?.generator?.prettierOptions);
 
         const filePath = config.generator?.filePath || path.join(process.cwd(), "types.ts");
+        const metadataFilePath = config.generator?.metadataFilePath || path.join(process.cwd(), "tables.json");
 
         if (config.generator?.checkDiff) {
             let diff = true;
+
             try {
                 const existingTypes = readFromFile(filePath);
+
                 diff = checkDiff(existingTypes, formattedTypes);
+
                 if (diff) {
                     log.warn("Types have changed. Updating types file...");
                 }
             } catch (err) {
                 log.warn("Types file not found. Creating a new one...");
             }
+
             if (diff) {
-                writeToFile(formattedTypes, filePath);
-                await db.destroy();
+                updateTypes(formattedTypes, filePath, tables, metadataFilePath, config);
+
                 log.info("Types updated successfully");
             } else {
                 log.info("Types have not changed");
             }
         } else {
-            writeToFile(formattedTypes, filePath);
+            updateTypes(formattedTypes, filePath, tables, metadataFilePath, config);
+
             log.info("Types updated successfully");
         }
+
+        await db.destroy();
     } catch (err) {
         log.error({ err }, "Error generating types");
     }

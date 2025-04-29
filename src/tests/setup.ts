@@ -1,4 +1,4 @@
-import { vi } from "vitest";
+import { afterEach, vi } from "vitest";
 
 process.env = {
     ...process.env,
@@ -6,3 +6,8 @@ process.env = {
 };
 
 vi.mock("oracledb");
+vi.mock("fs");
+
+afterEach(() => {
+    vi.restoreAllMocks();
+});

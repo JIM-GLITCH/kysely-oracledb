@@ -1,5 +1,24 @@
 # kysely-oracledb
 
+## 2.0.1
+
+### Patch Changes
+
+- 9797c4a: removed unused import for column type from generator file
+
+## 2.0.0
+
+### Major Changes
+
+- 33c8128: type mapping updated to correctly return dates and timestamps as JS dates rather than strings
+  if you want to keep dates as strings, you will need to convert them to strings yourself
+
+## 1.9.0
+
+### Minor Changes
+
+- 0c2f21f: added new generator options to allow table metadata generation in addition to db types
+
 ## 1.8.10
 
 ### Patch Changes

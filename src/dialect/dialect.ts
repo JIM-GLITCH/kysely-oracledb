@@ -1,6 +1,6 @@
 import { Dialect, Kysely } from "kysely";
 import { ExecuteOptions, Pool } from "oracledb";
-import { Options } from "prettier";
+import { Options as PrettierOptions } from "prettier";
 import { OracleAdapter } from "./adapter.js";
 import { OracleDriver } from "./driver.js";
 import { IntropsectorDB, OracleIntrospector } from "./introspector.js";
@@ -17,8 +17,10 @@ export interface OracleDialectConfig {
         views?: string[];
         camelCase?: boolean;
         checkDiff?: boolean;
+        metadata?: boolean;
         filePath?: string;
-        prettierOptions?: Options;
+        metadataFilePath?: string;
+        prettierOptions?: PrettierOptions;
     };
     executeOptions?: ExecuteOptions;
 }
