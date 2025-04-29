@@ -8,4 +8,5 @@ export default defineConfig({
     legacyOutput: true,
     outDir: "dist",
     sourcemap: true,
+    external: [],
 });
