@@ -3,6 +3,7 @@ import oracledb from "oracledb";
 import path from "path";
 import { fileURLToPath } from "url";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { mockedWrite } from "../__mocks__/fs.js";
 import {
     checkDiff,
     formatTypes,
@@ -24,7 +25,7 @@ describe("generateFieldTypes", () => {
                     isAutoIncrementing: false,
                 },
             ]),
-        ).toBe("name: string");
+        ).toBe("'name': string");
     });
     it("should generate type string for multiple fields", () => {
         expect(
@@ -44,7 +45,7 @@ describe("generateFieldTypes", () => {
                     isAutoIncrementing: false,
                 },
             ]),
-        ).toBe("first_name: string\nlast_name: string");
+        ).toBe("'first_name': string\n'last_name': string");
     });
     it("should generate type string for nullable field", () => {
         expect(
@@ -57,7 +58,7 @@ describe("generateFieldTypes", () => {
                     isAutoIncrementing: false,
                 },
             ]),
-        ).toBe("name: string | null");
+        ).toBe("'name': string | null");
     });
     it("should generate type string for identity field", () => {
         expect(
@@ -70,7 +71,20 @@ describe("generateFieldTypes", () => {
                     isAutoIncrementing: true,
                 },
             ]),
-        ).toBe("id: Generated<number>");
+        ).toBe("'id': Generated<number>");
+    });
+    it("should generate type for date", () => {
+        expect(
+            generateFieldTypes([
+                {
+                    name: "date",
+                    dataType: "DATE",
+                    isNullable: false,
+                    hasDefaultValue: false,
+                    isAutoIncrementing: false,
+                },
+            ]),
+        ).toBe("'date': Date");
     });
     it("should generate type string for camel case field", () => {
         expect(
@@ -86,7 +100,7 @@ describe("generateFieldTypes", () => {
                 ],
                 true,
             ),
-        ).toBe("firstName: string");
+        ).toBe("'firstName': string");
     });
     it("should throw error for unsupported data type", () => {
         expect(() =>
@@ -135,9 +149,9 @@ describe("generate table types", () => {
                 types:
                     "interface UserTable {" +
                     "\n" +
-                    "id: Generated<number>" +
+                    "'id': Generated<number>" +
                     "\n" +
-                    "name: string" +
+                    "'name': string" +
                     "\n" +
                     "}" +
                     "\n" +
@@ -207,9 +221,9 @@ describe("generate table types", () => {
                 types:
                     "interface UserTable {" +
                     "\n" +
-                    "id: Generated<number>" +
+                    "'id': Generated<number>" +
                     "\n" +
-                    "name: string" +
+                    "'name': string" +
                     "\n" +
                     "}" +
                     "\n" +
@@ -225,11 +239,11 @@ describe("generate table types", () => {
                 types:
                     "interface ProductTable {" +
                     "\n" +
-                    "id: Generated<number>" +
+                    "'id': Generated<number>" +
                     "\n" +
-                    "product: string" +
+                    "'product': string" +
                     "\n" +
-                    "price: number | null" +
+                    "'price': number | null" +
                     "\n" +
                     "}" +
                     "\n" +
@@ -275,9 +289,9 @@ describe("generate table types", () => {
                 types:
                     "interface UserProfileTable {" +
                     "\n" +
-                    "id: Generated<number>" +
+                    "'id': Generated<number>" +
                     "\n" +
-                    "name: string" +
+                    "'name': string" +
                     "\n" +
                     "}" +
                     "\n" +
@@ -405,7 +419,6 @@ describe("generate", () => {
     });
     it("should generate types and write to file", async () => {
         const filePath = path.join(path.dirname(fileURLToPath(import.meta.url)), "types.ts");
-        expect(fs.existsSync(filePath)).toBe(false);
         await generate({
             pool: await oracledb.createPool({
                 user: process.env.DB_USER,
@@ -417,9 +430,7 @@ describe("generate", () => {
                 filePath: filePath,
             },
         });
-        expect(fs.existsSync(filePath)).toBe(true);
-        fs.unlinkSync(filePath);
-        expect(fs.existsSync(filePath)).toBe(false);
+        expect(mockedWrite).toHaveBeenCalledTimes(1);
     });
     it("should generate types when checkDiff is false", async () => {
         vi.spyOn(fs, "writeFileSync").mockReturnValue();
@@ -513,5 +524,23 @@ describe("generate", () => {
         });
 
         expect(logger.info).toHaveBeenCalled();
+    });
+    it("should generate metadata and write to file", async () => {
+        const filePath = path.join(path.dirname(fileURLToPath(import.meta.url)), "types.ts");
+        const metadataFilePath = path.join(path.dirname(fileURLToPath(import.meta.url)), "tables.json");
+        await generate({
+            pool: await oracledb.createPool({
+                user: process.env.DB_USER,
+            }),
+            generator: {
+                schemas: ["SYS"],
+                tables: ["DUAL"],
+                checkDiff: true,
+                metadata: true,
+                filePath,
+                metadataFilePath,
+            },
+        });
+        expect(mockedWrite).toHaveBeenCalledTimes(2);
     });
 });

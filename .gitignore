@@ -4,3 +4,4 @@ dist
 .env
 types.dev.ts
 src/dev.ts
+tables.dev.json

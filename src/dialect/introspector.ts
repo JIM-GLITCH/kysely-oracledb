@@ -28,6 +28,9 @@ export interface AllTabColumnsTable {
     tableName: string;
     columnName: string;
     dataType: string;
+    dataLength: number | null;
+    dataPrecision: number | null;
+    dataScale: number | null;
     nullable: string;
     dataDefault: string | null;
     identityColumn: string;
@@ -87,7 +90,18 @@ export class OracleIntrospector implements DatabaseIntrospector {
         }
         const rawColumns = await this.#db
             .selectFrom("allTabColumns")
-            .select(["owner", "tableName", "columnName", "dataType", "nullable", "dataDefault", "identityColumn"])
+            .select([
+                "owner",
+                "tableName",
+                "columnName",
+                "dataType",
+                "dataLength",
+                "dataPrecision",
+                "dataScale",
+                "nullable",
+                "dataDefault",
+                "identityColumn",
+            ])
             .where("owner", "in", [...schemas, dualTable.owner])
             .where(
                 "tableName",
@@ -101,6 +115,9 @@ export class OracleIntrospector implements DatabaseIntrospector {
                 .map((col) => ({
                     name: col.columnName,
                     dataType: col.dataType,
+                    dataLength: col.dataLength,
+                    dataPrecision: col.dataPrecision,
+                    dataScale: col.dataScale,
                     isNullable: col.nullable === "Y",
                     hasDefaultValue: col.dataDefault !== null,
                     isAutoIncrementing: col.identityColumn === "YES",
@@ -144,7 +161,8 @@ export class OracleIntrospector implements DatabaseIntrospector {
                     hasDefaultValue: col.dataDefault !== null,
                     isAutoIncrementing: col.identityColumn === "YES",
                 }));
-            return { schema: view.owner, name: view.viewName, isView: true, columns };
+            const viewName = view.owner === "SYS" ? view.viewName.replace("_$", "$") : view.viewName;
+            return { schema: view.owner, name: viewName, isView: true, columns };
         });
         return views;
     }
